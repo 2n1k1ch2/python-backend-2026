@@ -1,19 +1,6 @@
 from fastapi import FastAPI, Query, HTTPException, Response, status
 from pydantic import BaseModel
 
-carts: dict[int, Cart] = {}
-items: dict[int, Item] = {}
-
-next_cart_id = 1
-next_item_id = 1
-
-app = FastAPI(title="Shop API")
-
-
-class Cart(BaseModel):
-    id: int
-    items: dict[int, CartItem] = {}
-    price: float
 
 class CartItem(BaseModel):
     id: int
@@ -21,19 +8,29 @@ class CartItem(BaseModel):
     quantity: int
     available: bool
 
+
+class Cart(BaseModel):
+    id: int
+    items: dict[int, CartItem] = {}
+    price: float
+
+
 class Item(BaseModel):
     id: int
     name: str
     price: float
     deleted: bool
 
+
 class ItemCreate(BaseModel):
     name: str
     price: float
 
+
 class ItemUpdate(BaseModel):
     name: str
     price: float
+
 
 class ItemPatch(BaseModel):
     name: str | None = None
@@ -42,6 +39,14 @@ class ItemPatch(BaseModel):
     model_config = {
         "extra": "forbid"
     }
+
+carts: dict[int, Cart] = {}
+items: dict[int, Item] = {}
+
+next_cart_id = 1
+next_item_id = 1
+
+app = FastAPI(title="Shop API")
 
 @app.post("/cart", status_code=status.HTTP_201_CREATED)
 def create_cart(response: Response):
