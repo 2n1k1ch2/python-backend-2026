@@ -1,39 +1,15 @@
-# Shop API + MySQL
+## ДЗ
 
-## Запуск
+За каждый пункт - 1 балл
 
-Из каталога проекта:
-
-```bash
-docker compose up --build -d
-docker compose ps
-```
-
-API: http://localhost:8080  
-Swagger: http://localhost:8080/docs  
-Prometheus: http://localhost:9090  
-Grafana: http://localhost:3000  
-Метрики FastAPI: http://localhost:8080/metrics
-
-MySQL хранит данные в named volume `mysql_data`, поэтому они сохраняются после перезапуска контейнеров.
-Для полного удаления данных: `docker compose down -v` (удалит БД!).
-
-## Проверка API
-
-```bash
-curl -X POST http://localhost:8080/item \
-  -H 'Content-Type: application/json' \
-  -d '{"name":"Keyboard","price":49.9}'
-
-curl -X POST http://localhost:8080/cart
-curl -X POST http://localhost:8080/cart/1/add/1
-curl http://localhost:8080/cart/1
-```
-
-Для локального запуска без Docker нужно задать `DATABASE_URL`, например:
-`mysql+pymysql://shop:shop_password@127.0.0.1:3306/shop`.
-
-## Изоляция транзакций
-
-Сценарии для dirty read, non-repeatable read и phantom read находятся в `tests`.
-Они специально выполняются в двух независимых MySQL-соединениях, чтобы порядок операций был наглядным.
+Внедрить во вторую домашку хранение данных в БД, для этого надо:
+1) Добавить БД в docket-compose.yml (если БД - это отдельный сервис, если хотите использовать sqlite, то можно скипнуть этот шаг)
+2) Переписать код на взаимодействие с вашей БД (если вы еще этого не сделали, если вы уже написали код с БД, подзравляю, вам остался только 3 пункт)
+3) В свободной форме, напишите скрипты, которые просимулируют разные "проблемы" которые могут возникнуть в транзакциях (dirty read, not-repeatable read, serialize) и настраивая уровне изоляции покажите, что они действительно решаются (через SQLAlchemy например), то есть:
+показать dirty read при read uncommited
+показать что нет dirty read при read commited
+показать non-repeatable read при read commited
+показать что нет non-repeatable read при repeatable read
+показать  phantom reads при repeatable read
+показать что нет phantom reads при serializable
+*Тут зависит от того какую БД вы выбрали, разные БД могут поддерживать разные уровни изоляции
